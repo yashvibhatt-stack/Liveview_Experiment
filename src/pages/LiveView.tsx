@@ -12,6 +12,11 @@ export default function LiveView() {
   const [onlineOnly, setOnlineOnly] = useState(false);
   const [open, setOpen] = useState<Record<string, boolean>>({ "head-office": true });
   const [selected, setSelected] = useState("02");
+  const [activeTile, setActiveTile] = useState<string | null>(null); // tile border only after an explicit pick
+  const select = (channel: string) => {
+    setSelected(channel);
+    setActiveTile(channel);
+  };
   const [mode, setMode] = useState<"live" | "playback">("live");
   const [page, setPage] = useState(1);
   const [slideshow, setSlideshow] = useState(false);
@@ -38,7 +43,7 @@ export default function LiveView() {
   const viewAlarmCamera = () => {
     setTilesCleared(false);
     setPage(1);
-    setSelected(alarmCamera.channel);
+    select(alarmCamera.channel);
   };
   const dismissToast = () => {
     setToastVisible(false);
@@ -86,7 +91,7 @@ export default function LiveView() {
                           name={c.name}
                           isOnline={c.isOnline}
                           selected={selected === c.channel}
-                          onSelect={() => setSelected(c.channel)}
+                          onSelect={() => select(c.channel)}
                         />
                       ))}
                     </div>
@@ -116,8 +121,8 @@ export default function LiveView() {
                 channel={c.channel}
                 name={c.name}
                 src={cameraFeeds[c.feed]}
-                isSelected={selected === c.channel}
-                onSelect={() => setSelected(c.channel)}
+                isSelected={activeTile === c.channel}
+                onSelect={() => select(c.channel)}
               />
             ))}
             {tilesCleared && (

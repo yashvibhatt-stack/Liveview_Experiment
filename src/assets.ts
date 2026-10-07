@@ -30,4 +30,4 @@ export const icons = {
 };
 
 export const logoMark = "/assets/images/logo-mark.png";
-export const cameraFeeds = Array.from({ length: 9 }, (_, i) => `/assets/images/camera-0${i + 1}.png`);
+export const cameraFeeds = Array.from({ length: 9 }, (_, i) => `/assets/images/camera-0${i + 1}.jpg`);
