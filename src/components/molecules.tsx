@@ -57,19 +57,25 @@ export function SpeakToDevice({ deviceName }: { deviceName: string }) {
 export function NotificationTrigger({ count, status }: { count: number; status: "unread" | "critical" }) {
   return (
     <div className="notification-trigger">
-      <IconButton icon={icons.bellRing} size="default" label={`Events, ${count} ${status === "critical" ? "critical" : "unread"}`} />
+      <IconButton icon={status === "critical" ? icons.bellRing : icons.bell} size="default" label={`Events, ${count} ${status === "critical" ? "critical" : "unread"}`} />
       <span className={`notification-trigger__count notification-trigger__count--${status} t-label-xs`}>{count > 99 ? "99+" : count}</span>
     </div>
   );
 }
 
 /* ---------- AccountTrigger ---------- */
-export function AccountTrigger({ name, initials }: { name: string; initials: string }) {
+export function AccountTrigger({ name, initials, role }: { name: string; initials: string; role?: string }) {
   const [open, setOpen] = useState(false);
   return (
     <button type="button" className="account-trigger" aria-label={`Account, ${name}`} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
       <Avatar initials={initials} />
-      <img className="icon icon--sm" src={icons.accountChevron} alt="" />
+      {role && (
+        <span className="account-trigger__details">
+          <span className="t-label-sm">{name}</span>
+          <span className="t-label-xs account-trigger__role">{role}</span>
+        </span>
+      )}
+      {role ? <img className="icon" src={icons.accountChevron16} alt="" /> : <img className="icon icon--sm" src={icons.accountChevron} alt="" />}
     </button>
   );
 }
@@ -116,17 +122,61 @@ type CameraListItemProps = {
   name: string;
   isOnline: boolean;
   selected: boolean;
-  statusText?: string;
+  statusText?: string; // anything other than Online shows dot + text
+  query?: string; // highlights the matched part of the name
+  isDragging?: boolean;
+  hideStatus?: boolean; // live camera with no status dot
   onSelect: () => void;
+  onOpen?: () => void; // double-click / Enter
+  onPointerDown?: (e: React.PointerEvent) => void; // drag start
 };
 
-export function CameraListItem({ channel, name, isOnline, selected, statusText, onSelect }: CameraListItemProps) {
+const Highlight = ({ text, query }: { text: string; query?: string }) => {
+  const q = query?.trim();
+  const i = q ? text.toLowerCase().indexOf(q.toLowerCase()) : -1;
+  if (i === -1 || !q) return <>{text}</>;
   return (
-    <button type="button" className="camera-list-item" data-state={selected ? "selected" : "default"} aria-current={selected ? "true" : undefined} title={name} onClick={onSelect} onDoubleClick={onSelect}>
+    <>
+      {text.slice(0, i)}
+      <strong className="match">{text.slice(i, i + q.length)}</strong>
+      {text.slice(i + q.length)}
+    </>
+  );
+};
+
+export function CameraListItem({ channel, name, isOnline, selected, statusText, query, isDragging, hideStatus, onSelect, onOpen, onPointerDown }: CameraListItemProps) {
+  return (
+    <button
+      type="button"
+      className="camera-list-item"
+      data-state={selected ? "selected" : "default"}
+      data-dragging={isDragging || undefined}
+      aria-current={selected ? "true" : undefined}
+      title={name}
+      onClick={onSelect}
+      onDoubleClick={onOpen}
+      onKeyDown={(e) => e.key === "Enter" && onOpen?.()}
+      onPointerDown={onPointerDown}
+    >
       <span className="camera-list-item__channel t-label-xs">{channel}</span>
-      {isOnline && <StatusDot variant="positive" label="Online" />}
-      <span className="camera-list-item__name t-body-md truncate">{name}</span>
-      {statusText && <Badge label={statusText} variant="negative" />}
+      {isOnline && !hideStatus && <StatusDot variant="positive" label="Online" />}
+      {!isOnline && statusText && <StatusDot variant="negative" label={statusText} />}
+      <span className="camera-list-item__name t-body-md truncate">
+        <Highlight text={name} query={query} />
+      </span>
+      {statusText && <Badge label={statusText} variant="negative" hasDot />}
+    </button>
+  );
+}
+
+/* ---------- StyleListItem ---------- */
+export function StyleListItem({ name, layout, isDefault, selected, onSelect }: { name: string; layout: string; isDefault?: boolean; selected: boolean; onSelect: () => void }) {
+  return (
+    <button type="button" className="style-list-item" data-state={selected ? "selected" : "default"} aria-current={selected ? "true" : undefined} onClick={onSelect}>
+      <img className="icon" src={icons.styleLayout} alt="" />
+      <span className="style-list-item__name t-body-md truncate">{name}</span>
+      <span className="style-list-item__layout t-label-xs">{layout}</span>
+      {isDefault && <img className="icon icon--sm" src={icons.star} alt="Opens at login" />}
     </button>
   );
 }

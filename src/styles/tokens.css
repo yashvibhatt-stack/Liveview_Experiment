@@ -32,6 +32,12 @@
   --interactive-background-primary-faded: #f7f2fc;
   --interactive-background-negative-default: #d92d20;
   --interactive-border-gray-default: #8995a2;
+  --interactive-border-gray-faded: #c9d2db;
+  --interactive-border-primary-default: #5a2b97;
+  --interactive-border-focus-default: #915ed4;
+  --interactive-border-negative-default: #d92d20;
+  --popup-border-subtle: #e0e6ef;
+  --overlay-background-moderate: rgba(0, 0, 0, 0.48);
   --interactive-text-gray-default: #1f2933;
   --interactive-text-primary-default: #5a2b97;
   --interactive-text-white-default: #ffffff;

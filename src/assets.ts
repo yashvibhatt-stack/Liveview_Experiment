@@ -27,7 +27,16 @@ export const icons = {
   layoutGrid: icon("layout-grid"),
   maximize: icon("maximize"),
   x: icon("x"),
+  plus: icon("plus"),
+  undo: icon("undo"),
+  toastUndo: icon("toast-undo"),
+  styleLayout: icon("style-layout"),
+  star: icon("star"),
+  bell: icon("bell"),
+  accountChevron16: icon("account-chevron-16"),
 };
+
+export const noPermissionIllustration = "/assets/images/illustration-no-permission.png";
 
 export const logoMark = "/assets/images/logo-mark.png";
 export const cameraFeeds = Array.from({ length: 9 }, (_, i) => `/assets/images/camera-0${i + 1}.jpg`);

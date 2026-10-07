@@ -3,9 +3,9 @@ import { cameraFeeds, icons } from "../assets";
 import { Input, Tabs } from "../components/atoms";
 import { AccordionTrigger, CameraListItem, SwitchField } from "../components/molecules";
 import { EventToast, LiveViewToolbar, NavRail, Topbar, VideoTile } from "../components/organisms";
-import { nvrs, TILES_PER_PAGE, TOTAL_PAGES, type Camera } from "../data";
+import { nvrs, TILES_PER_PAGE, TOTAL_PAGES, type Camera } from "./alarmData";
 
-export default function LiveView() {
+export default function CriticalAlarm() {
   const [nav, setNav] = useState("home");
   const [panelTab, setPanelTab] = useState<"cameras" | "styles">("cameras");
   const [query, setQuery] = useState("");

@@ -68,13 +68,16 @@ export function IconButton({ icon, label, size = "sm", className = "", ...rest }
 
 /* ---------- Button ---------- */
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "default" | "ghost";
+  variant?: "default" | "outline" | "ghost";
+  size?: "sm" | "default"; // sm 28 | default 32
+  iconLeft?: string;
   children: ReactNode;
 };
 
-export function Button({ variant = "default", className = "", children, ...rest }: ButtonProps) {
+export function Button({ variant = "default", size = "sm", iconLeft, className = "", children, ...rest }: ButtonProps) {
   return (
-    <button type="button" className={`button button--sm button--${variant} ${className}`} {...rest}>
+    <button type="button" className={`button button--${size} button--${variant} ${className}`} {...rest}>
+      {iconLeft && <img className="icon" src={iconLeft} alt="" />}
       {children}
     </button>
   );
@@ -131,28 +134,88 @@ type InputProps = {
   placeholder?: string;
   iconLeft?: string;
   ariaLabel: string;
+  onClear?: () => void; // shows a clear (×) button while the field has a value
+  error?: boolean; // aria-invalid + negative border
+  inputRef?: React.Ref<HTMLInputElement>;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  type?: "text" | "search";
+  autoFocus?: boolean;
 };
 
-export function Input({ value, onChange, placeholder, iconLeft, ariaLabel }: InputProps) {
+export function Input({ value, onChange, placeholder, iconLeft, ariaLabel, onClear, error, inputRef, onKeyDown, type = "search", autoFocus }: InputProps) {
   return (
-    <label className="input">
+    <label className={`input ${error ? "input--error" : ""}`}>
       {iconLeft && <img className="icon" src={iconLeft} alt="" />}
       <input
+        ref={inputRef}
         className="input__field t-body-md"
-        type="search"
+        type={type}
         value={value}
         placeholder={placeholder}
         aria-label={ariaLabel}
+        aria-invalid={error || undefined}
+        autoFocus={autoFocus}
+        data-autofocus={autoFocus ? "" : undefined}
+        onKeyDown={onKeyDown}
         onChange={(e) => onChange(e.target.value)}
       />
+      {onClear && value && (
+        <button type="button" className="input__clear" aria-label="Clear search" onClick={onClear}>
+          <img className="icon" src={icons.x} alt="" />
+        </button>
+      )}
+    </label>
+  );
+}
+
+/* ---------- Field (label + control + helper / error) ---------- */
+export function Field({ label, helper, error, children }: { label: string; helper?: string; error?: string; children: ReactNode }) {
+  return (
+    <div className="field">
+      <p className="t-label-md">{label}</p>
+      {children}
+      {(error || helper) && (
+        <p className={`t-body-sm field__helper ${error ? "field__helper--error" : ""}`} role={error ? "alert" : undefined}>
+          {error ?? helper}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* ---------- CheckboxField ---------- */
+export function CheckboxField({ label, checked, onCheckedChange }: { label: string; checked: boolean; onCheckedChange: (v: boolean) => void }) {
+  return (
+    <label className="choice-field">
+      <span className="choice-field__control">
+        <input type="checkbox" className="checkbox" checked={checked} onChange={(e) => onCheckedChange(e.target.checked)} />
+      </span>
+      <span className="t-label-md choice-field__label">{label}</span>
+    </label>
+  );
+}
+
+/* ---------- RadioField ---------- */
+export function RadioField({ name, label, description, checked, onChange }: { name: string; label: string; description?: string; checked: boolean; onChange: () => void }) {
+  return (
+    <label className="choice-field">
+      <span className="choice-field__control">
+        <input type="radio" className="radio" name={name} checked={checked} onChange={onChange} />
+      </span>
+      <span className="choice-field__text">
+        <span className="t-label-md choice-field__label">{label}</span>
+        {description && <span className="t-body-sm choice-field__description">{description}</span>}
+      </span>
     </label>
   );
 }
 
 /* ---------- SelectTrigger (sm 28) ---------- */
-export function SelectTrigger({ value, width = 180, ariaLabel }: { value: string; width?: number; ariaLabel: string }) {
+type SelectTriggerProps = { value: string; width?: number; ariaLabel: string; onClick?: () => void; expanded?: boolean };
+
+export function SelectTrigger({ value, width = 180, ariaLabel, onClick, expanded }: SelectTriggerProps) {
   return (
-    <button type="button" className="select-trigger" style={{ width }} aria-haspopup="listbox" aria-label={ariaLabel}>
+    <button type="button" className="select-trigger" style={{ width }} aria-haspopup="menu" aria-expanded={expanded} aria-label={ariaLabel} data-state={expanded ? "open" : "closed"} onClick={onClick}>
       <span className="select-trigger__value t-body-sm truncate">{value}</span>
       <img className="icon" src={icons.chevronDown} alt="" />
     </button>
